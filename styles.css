@@ -74,7 +74,7 @@ body{
 .eyebrow{
   font-family:'Montserrat',sans-serif;
   font-weight:400;
-  font-size: 1.2rem;
+  font-size: 1.35rem;
   letter-spacing:.42em;       /* широкий трекинг — фирменный «разрядка» */
   text-transform:uppercase;
   color:var(--olive);
@@ -152,6 +152,32 @@ body{
 .sprig{display:block;margin:0 auto;width:160px;height:auto;color:var(--olive);opacity:.9;}
 .sprig.small{width:96px;}   /* уменьшенный вариант под заголовками */
 
+/* --- Боковые веточки-украшения (та же графика, повёрнутая вертикально) ---
+   Закреплены поверх слайдов по левому и правому краю и общие для всех
+   разделов: при смене слайда остаются на месте, образуя рамку. */
+.side-vine{
+  position:fixed;top:50%;transform:translateY(-50%);
+  z-index:5;                       /* над фоном слайда (z-index:2), но под навигацией (30+) */
+  pointer-events:none;             /* не перехватывают прокрутку/клики */
+  width:48px;                      /* узкая полоса у самого края */
+  height:clamp(170px,32vh,330px);  /* длина веточки по вертикали */
+  color:var(--olive);opacity:.5;
+}
+.side-vine--left{left:6px;}
+.side-vine--right{right:6px;}
+
+/* Сама графика: горизонтальный sprig, развёрнутый на 90° в вертикаль.
+   Базовый поворот — для правой веточки (листья смотрят вправо). */
+.side-vine .vine{
+  position:absolute;top:50%;left:50%;
+  width:clamp(170px,32vh,330px);   /* совпадает с высотой контейнера */
+  height:auto;
+  transform:translate(-50%,-50%) rotate(90deg);
+  transform-origin:center;
+}
+/* Левую веточку разворачиваем в обратную сторону — листья смотрят влево. */
+.side-vine--left .vine{transform:translate(-50%,-50%) rotate(-90deg);}
+
 
 /* ============================================================
    7. СЛАЙД: ТИТУЛЬНЫЙ
@@ -197,7 +223,7 @@ body{
 
 /* Подпись под цифрой (дней/часов/…). */
 .cd-lbl{
-  font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;
+  font-size:.84rem;letter-spacing:.26em;text-transform:uppercase;
   color:var(--muted);margin-top:8px;
 }
 
@@ -228,7 +254,7 @@ body{
 .venue-address .addr{
   font-family:'Cormorant',serif;font-size:1.5rem;line-height:1.2;color:var(--ink);
 }
-.venue-address .addr-sub{color:var(--muted);font-size:1.02rem;margin-top:8px;line-height:1.5;}
+.venue-address .addr-sub{color:var(--muted);font-size:1.16rem;margin-top:8px;line-height:1.5;}
 
 /* Рамка вокруг встроенной карты (растягивается на остаток высоты колонки). */
 .map-frame{
@@ -258,7 +284,7 @@ body{
 /* Контурная кнопка-ссылка (например, «Открыть в Яндекс Картах»). */
 .btn{
   display:inline-block;margin-top:24px;
-  font-size:.84rem;letter-spacing:.26em;text-transform:uppercase;
+  font-size:.94rem;letter-spacing:.26em;text-transform:uppercase;
   color:var(--olive-deep);text-decoration:none;
   border:1px solid var(--olive);border-radius:40px;
   padding:14px 30px;transition:.3s ease;
@@ -304,8 +330,8 @@ body{
 }
 
 /* Название события и пояснение под ним. */
-.tl-event{font-size:1.4rem;color:var(--ink);}
-.tl-event small{display:block;color:var(--muted);font-size:1.2rem; margin-top:2px;}
+.tl-event{font-size:1.55rem;color:var(--ink);}
+.tl-event small{display:block;color:var(--muted);font-size:1.32rem; margin-top:2px;}
 
 
 /* ============================================================
@@ -314,7 +340,7 @@ body{
 
 /* Вводный абзац-просьба поддержать палитру. */
 .palette-lead{
-  max-width:600px;margin:18px auto 0;font-size:1.32rem;color:var(--ink);
+  max-width:640px;margin:18px auto 0;font-size:1.5rem;color:var(--ink);
 }
 
 /* Ряд образцов цвета — все шесть в одну строку, без переноса. */
@@ -338,7 +364,7 @@ body{
 
 /* Заключительное примечание (необязательность дресс-кода). */
 .palette-note{
-  max-width:520px;margin:0 auto;font-size:1.04rem;color:var(--muted);font-style:italic;
+  max-width:560px;margin:0 auto;font-size:1.16rem;color:var(--muted);font-style:italic;
 }
 
 
@@ -386,10 +412,12 @@ body{
    13. НАВИГАЦИЯ
    ============================================================ */
 
-/* --- Точки-индикаторы справа по центру экрана --- */
+/* --- Точки-индикаторы: горизонтальный ряд в левом нижнем углу ---
+   Вынесены к краю, чтобы не перекрывать контент, и смещены влево —
+   не конфликтуют с центральной кнопкой «Далее». */
 .dots{
-  position:fixed;top:50%;right:clamp(14px,2.6vw,30px);transform:translateY(-50%);
-  z-index:30;display:flex;flex-direction:column;gap:16px;
+  position:fixed;left:clamp(16px,3vw,30px);bottom:24px;
+  z-index:30;display:flex;flex-direction:row;gap:14px;
 }
 
 /* Одна точка — пустой кружок с оливковой обводкой. */
@@ -412,7 +440,7 @@ body{
   position:fixed;bottom:26px;left:50%;transform:translateX(-50%);
   z-index:30;background:none;border:0;cursor:pointer;color:var(--muted);
   display:flex;flex-direction:column;align-items:center;gap:9px;
-  font-family:'Montserrat',sans-serif;font-size:.68rem;letter-spacing:.3em;
+  font-family:'Montserrat',sans-serif;font-size:.78rem;letter-spacing:.3em;
   text-transform:uppercase;transition:opacity .5s var(--ease),color .3s ease;
 }
 .nav-next:hover{color:var(--olive-deep);}
@@ -441,6 +469,12 @@ body{
    14. АДАПТИВ И ДОСТУПНОСТЬ
    ============================================================ */
 
+/* Средние экраны: уменьшаем боковые веточки, чтобы не теснили контент. */
+@media (max-width:1024px){
+  .side-vine{width:34px;height:clamp(140px,24vh,230px);opacity:.4;}
+  .side-vine .vine{width:clamp(140px,24vh,230px);}
+}
+
 /* Узкие экраны (телефоны): колонки в одну, компактнее таймлайн. */
 @media (max-width:760px){
   .venue-grid{grid-template-columns:1fr;min-height:0;} /* адрес+карта, затем фото */
@@ -450,6 +484,7 @@ body{
   .tl-item::after{left:80px;}
   .tl-time{font-size:1.3rem;}
   .dots{gap:13px;}
+  .side-vine{display:none;}                            /* на телефонах убираем — мало места */
 }
 
 /* Уважаем системную настройку «уменьшить движение»:
