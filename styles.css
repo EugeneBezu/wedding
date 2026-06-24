@@ -54,7 +54,7 @@ body{
   background:var(--bg);                  /* базовый фон страницы */
   color:var(--ink);                      /* цвет текста по умолчанию */
   font-family:'Montserrat',sans-serif;   /* основной (текстовый) шрифт */
-  font-weight:300;                       /* лёгкое тонкое начертание */
+  font-weight:400;                       /* лёгкое тонкое начертание */
   line-height:1.7;                       /* просторный межстрочный интервал */
   -webkit-font-smoothing:antialiased;    /* сглаживание шрифта в WebKit */
   overflow:hidden;                       /* прокрутку страницы заменяет смена слайдов */
@@ -307,8 +307,8 @@ body{
 }
 
 /* Название события и пояснение под ним. */
-.tl-event{font-size:1.2rem;color:var(--ink);}
-.tl-event small{display:block;color:var(--muted);font-size:1rem;margin-top:2px;}
+.tl-event{font-size:1.4rem;color:var(--ink);}
+.tl-event small{display:block;color:var(--muted);font-size:1.2rem; margin-top:2px;}
 
 
 /* ============================================================
