@@ -189,11 +189,6 @@ body{
 }
 .hero-names .row{display:block;}   /* каждое имя с новой строки */
 
-/* Заглушка фото пары на титуле, пропорции портрета 3:4. */
-.hero-photo{
-  width:min(300px,72vw);aspect-ratio:3/4;margin:8px auto;
-}
-
 /* Дата свадьбы крупными цифрами. */
 .hero-date{
   font-family:'Cormorant',serif;font-size:clamp(1.5rem,4.5vw,2.4rem);
@@ -363,9 +358,6 @@ body{
     radial-gradient(120% 90% at 50% 0%, var(--rose-soft) 0%, transparent 55%),
     var(--bg);
 }
-
-/* Заглушка фото жениха и невесты. */
-.finale-photo{width:min(360px,80vw);aspect-ratio:4/5;margin:40px auto 0;}
 
 /* Крупная приглашающая фраза. */
 .finale-text{
