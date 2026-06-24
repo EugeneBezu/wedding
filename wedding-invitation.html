@@ -19,11 +19,12 @@
     --muted:     #807C6E;   /* приглушённый текст */
     --line:      #DDD7C9;   /* тонкие линии */
     --maxw: 1080px;
+    --ease: cubic-bezier(.22,.68,.28,1);
   }
 
   *{box-sizing:border-box;margin:0;padding:0;}
 
-  html{scroll-behavior:smooth;}
+  html,body{height:100%;}
 
   body{
     background:var(--bg);
@@ -32,7 +33,7 @@
     font-weight:300;
     line-height:1.7;
     -webkit-font-smoothing:antialiased;
-    overflow-x:hidden;
+    overflow:hidden;            /* прокрутку заменяет смена слайдов */
   }
 
   /* ---------- Типографика ---------- */
@@ -47,19 +48,49 @@
   }
   .amp{color:var(--rose);font-style:italic;font-weight:400;}
 
-  /* ---------- Раскладка секций ---------- */
-  section{padding:clamp(72px,11vw,140px) 24px;}
-  .wrap{max-width:var(--maxw);margin:0 auto;}
+  /* =================== СИСТЕМА СЛАЙДОВ =================== */
+  .deck{position:fixed;inset:0;overflow:hidden;}
+
+  .slide{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;
+    justify-content:safe center;        /* центр, но при переполнении — скролл сверху */
+    align-items:center;
+    overflow-y:auto;overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    padding:clamp(56px,9vw,120px) 24px;
+    opacity:0;visibility:hidden;
+    transform:translateY(7%) scale(.985);
+    transition:opacity .8s var(--ease),
+               transform .8s var(--ease),
+               visibility .8s var(--ease);
+    will-change:opacity,transform;
+  }
+  /* активный слайд */
+  .slide.is-active{
+    opacity:1;visibility:visible;
+    transform:none;
+    z-index:2;
+  }
+  /* слайды, оставшиеся «выше» текущего — уезжают вверх */
+  .slide.is-above{
+    transform:translateY(-7%) scale(.985);
+  }
+
+  .slide-bg-soft{background:var(--bg-soft);}
+
+  /* ---------- Раскладка содержимого ---------- */
+  .wrap{max-width:var(--maxw);margin:0 auto;width:100%;}
   .center{text-align:center;}
 
-  /* ---------- Оливковая веточка-разделитель (фирменный элемент) ---------- */
+  /* ---------- Оливковая веточка-разделитель ---------- */
   .sprig{display:block;margin:0 auto;width:160px;height:auto;color:var(--olive);opacity:.9;}
   .sprig.small{width:96px;}
 
   /* ---------- Арочная рамка для фото ---------- */
   .photo{
     position:relative;
-    border-radius:50% 50% 8px 8px / 38% 38% 8px 8px; /* арка */
+    border-radius:50% 50% 8px 8px / 38% 38% 8px 8px;
     overflow:hidden;
     background:
       linear-gradient(150deg, var(--rose-soft), var(--bg-soft) 55%, #E4E3D2);
@@ -75,12 +106,7 @@
   .photo .ph-icon{display:block;margin:0 auto 12px;color:var(--olive);opacity:.65;}
 
   /* =================== ТИТУЛЬНЫЙ СЛАЙД =================== */
-  .hero{
-    min-height:100svh;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    text-align:center;gap:30px;position:relative;
-    padding:64px 24px;
-  }
+  .hero{gap:30px;text-align:center;position:relative;}
   .hero-monogram{
     font-family:'Cormorant',serif;font-size:1.5rem;letter-spacing:.3em;
     color:var(--olive-deep);
@@ -114,16 +140,7 @@
     color:var(--muted);margin-top:8px;
   }
 
-  .scroll-hint{
-    position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
-    font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);
-    display:flex;flex-direction:column;align-items:center;gap:10px;
-  }
-  .scroll-hint .bar{width:1px;height:46px;background:var(--olive);opacity:.5;animation:drip 2.4s ease-in-out infinite;transform-origin:top;}
-  @keyframes drip{0%,100%{transform:scaleY(.35);opacity:.25;}50%{transform:scaleY(1);opacity:.7;}}
-
   /* =================== МЕСТО ПРОВЕДЕНИЯ =================== */
-  .venue{background:var(--bg-soft);}
   .venue-head{margin-bottom:48px;}
   .venue-title{font-size:clamp(2.4rem,6vw,3.6rem);margin:14px 0 6px;}
   .venue-grid{
@@ -138,9 +155,7 @@
     background:var(--bg);min-height:340px;height:100%;
   }
   .map-frame iframe{display:block;width:100%;height:100%;min-height:340px;border:0;}
-  .venue-address{
-    margin-top:40px;text-align:center;
-  }
+  .venue-address{margin-top:40px;text-align:center;}
   .venue-address .addr{
     font-family:'Cormorant',serif;font-size:1.5rem;color:var(--ink);
   }
@@ -157,9 +172,7 @@
   /* =================== ПРОГРАММА ДНЯ =================== */
   .program-head{margin-bottom:54px;}
   .program-title{font-size:clamp(2.4rem,6vw,3.6rem);margin-top:14px;}
-  .timeline{
-    max-width:620px;margin:0 auto;position:relative;
-  }
+  .timeline{max-width:620px;margin:0 auto;position:relative;width:100%;}
   .timeline::before{
     content:"";position:absolute;left:118px;top:8px;bottom:8px;width:1px;
     background:linear-gradient(var(--rose-soft),var(--line),var(--rose-soft));
@@ -175,13 +188,12 @@
   .tl-item::after{
     content:"";position:absolute;left:114px;top:30px;
     width:9px;height:9px;border-radius:50%;
-    background:var(--rose);border:2px solid var(--bg);
+    background:var(--rose);border:2px solid var(--bg-soft);
   }
   .tl-event{font-size:1.04rem;color:var(--ink);}
   .tl-event small{display:block;color:var(--muted);font-size:.86rem;margin-top:2px;}
 
   /* =================== ЦВЕТОВАЯ ГАММА =================== */
-  .palette{background:var(--bg-soft);}
   .palette-lead{
     max-width:560px;margin:18px auto 0;font-size:1.12rem;color:var(--ink);
   }
@@ -221,9 +233,53 @@
     color:var(--olive-deep);
   }
 
-  /* ---------- Анимация появления ---------- */
-  .reveal{opacity:0;transform:translateY(26px);transition:opacity .9s ease,transform .9s ease;}
-  .reveal.in{opacity:1;transform:none;}
+  /* ---------- Появление элементов внутри активного слайда ---------- */
+  .reveal{
+    opacity:0;transform:translateY(26px);
+    transition:opacity .8s var(--ease),transform .8s var(--ease);
+  }
+  .slide.is-active .reveal.in{opacity:1;transform:none;}
+
+  /* =================== НАВИГАЦИЯ =================== */
+  /* Точки-индикаторы справа */
+  .dots{
+    position:fixed;top:50%;right:clamp(14px,2.6vw,30px);transform:translateY(-50%);
+    z-index:30;display:flex;flex-direction:column;gap:16px;
+  }
+  .dots button{
+    --d:9px;width:var(--d);height:var(--d);padding:0;border:0;cursor:pointer;
+    border-radius:50%;background:transparent;
+    box-shadow:inset 0 0 0 1.5px var(--olive);
+    transition:transform .35s var(--ease),background .35s var(--ease),box-shadow .35s var(--ease);
+  }
+  .dots button:hover{transform:scale(1.25);}
+  .dots button.active{
+    background:var(--rose);box-shadow:inset 0 0 0 1.5px var(--rose);
+    transform:scale(1.35);
+  }
+
+  /* Кнопка «дальше» снизу */
+  .nav-next{
+    position:fixed;bottom:26px;left:50%;transform:translateX(-50%);
+    z-index:30;background:none;border:0;cursor:pointer;color:var(--muted);
+    display:flex;flex-direction:column;align-items:center;gap:9px;
+    font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:.3em;
+    text-transform:uppercase;transition:opacity .5s var(--ease),color .3s ease;
+  }
+  .nav-next:hover{color:var(--olive-deep);}
+  .nav-next .bar{
+    width:1px;height:42px;background:var(--olive);opacity:.5;
+    transform-origin:top;animation:drip 2.4s ease-in-out infinite;
+  }
+  .nav-next.hidden{opacity:0;pointer-events:none;}
+  @keyframes drip{0%,100%{transform:scaleY(.35);opacity:.25;}50%{transform:scaleY(1);opacity:.7;}}
+
+  /* Прогресс-полоса сверху */
+  .progress{
+    position:fixed;top:0;left:0;height:2px;width:0;z-index:40;
+    background:linear-gradient(90deg,var(--olive),var(--rose));
+    transition:width .8s var(--ease);
+  }
 
   /* ---------- Адаптив ---------- */
   @media (max-width:760px){
@@ -232,58 +288,163 @@
     .tl-item{grid-template-columns:70px 1fr;gap:24px;}
     .tl-item::after{left:80px;}
     .tl-time{font-size:1.3rem;}
+    .dots{gap:13px;}
   }
 
   @media (prefers-reduced-motion:reduce){
     *{animation:none!important;}
-    html{scroll-behavior:auto;}
-    .reveal{opacity:1;transform:none;transition:none;}
+    .slide{transition:opacity .35s linear,visibility .35s linear;transform:none!important;}
+    .reveal{transition:opacity .35s linear;transform:none!important;}
   }
 </style>
 </head>
 <body>
 
-  <!-- ============ ТИТУЛЬНЫЙ СЛАЙД ============ -->
-  <header class="hero">
-    <div class="hero-monogram reveal">Е &middot; А</div>
-    <h1 class="display hero-names reveal">
-      <span class="row">Евгений</span>
-      <span class="row"><span class="amp">&amp;</span> Анна</span>
-    </h1>
+  <div class="progress" id="progress" aria-hidden="true"></div>
 
-    <div class="hero-photo photo reveal">
-      <div class="ph-label">
-        <svg class="ph-icon" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
-          <rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.2"/><path d="M3 17l5-4 4 3 3-2 6 4"/>
-        </svg>
-        Фото пары
+  <main class="deck" id="deck">
+
+    <!-- ============ ТИТУЛЬНЫЙ СЛАЙД ============ -->
+    <section class="slide hero is-active" data-name="Главная" aria-label="Титульная страница">
+      <div class="hero-monogram reveal">Е &middot; А</div>
+      <h1 class="display hero-names reveal">
+        <span class="row">Евгений</span>
+        <span class="row"><span class="amp">&amp;</span> Анна</span>
+      </h1>
+
+      <div class="hero-photo photo reveal">
+        <div class="ph-label">
+          <svg class="ph-icon" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+            <rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.2"/><path d="M3 17l5-4 4 3 3-2 6 4"/>
+          </svg>
+          Фото пары
+        </div>
       </div>
-    </div>
 
-    <p class="hero-date reveal">30 <span class="dot">&bull;</span> 08 <span class="dot">&bull;</span> 2026</p>
-    <p class="eyebrow reveal">30 августа 2026 года</p>
+      <p class="hero-date reveal">30 <span class="dot">&bull;</span> 08 <span class="dot">&bull;</span> 2026</p>
+      <p class="eyebrow reveal">30 августа 2026 года</p>
 
-    <div class="countdown reveal" id="countdown" aria-label="Обратный отсчёт до свадьбы">
-      <div class="cd-cell"><div class="cd-num" id="cd-days">—</div><div class="cd-lbl">дней</div></div>
-      <div class="cd-cell"><div class="cd-num" id="cd-hours">—</div><div class="cd-lbl">часов</div></div>
-      <div class="cd-cell"><div class="cd-num" id="cd-mins">—</div><div class="cd-lbl">минут</div></div>
-      <div class="cd-cell"><div class="cd-num" id="cd-secs">—</div><div class="cd-lbl">секунд</div></div>
-    </div>
+      <div class="countdown reveal" id="countdown" aria-label="Обратный отсчёт до свадьбы">
+        <div class="cd-cell"><div class="cd-num" id="cd-days">—</div><div class="cd-lbl">дней</div></div>
+        <div class="cd-cell"><div class="cd-num" id="cd-hours">—</div><div class="cd-lbl">часов</div></div>
+        <div class="cd-cell"><div class="cd-num" id="cd-mins">—</div><div class="cd-lbl">минут</div></div>
+        <div class="cd-cell"><div class="cd-num" id="cd-secs">—</div><div class="cd-lbl">секунд</div></div>
+      </div>
+    </section>
 
-    <div class="scroll-hint" aria-hidden="true">
-      <span>листайте</span>
-      <span class="bar"></span>
-    </div>
-  </header>
+    <!-- ============ МЕСТО ПРОВЕДЕНИЯ ============ -->
+    <section class="slide slide-bg-soft" data-name="Место" aria-label="Место проведения">
+      <div class="wrap">
+        <div class="venue-head center reveal">
+          <span class="eyebrow">Место проведения</span>
+          <h2 class="display venue-title">Загородный клуб «Голицин»</h2>
+          <svg class="sprig small" viewBox="0 0 200 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <path d="M10 20 H190"/>
+            <path d="M70 20c-6-8-16-9-22-6 4 6 14 9 22 6Z" fill="currentColor" stroke="none" opacity=".85"/>
+            <path d="M90 20c-5-9-15-11-22-9 3 7 13 11 22 9Z" fill="currentColor" stroke="none" opacity=".85"/>
+            <path d="M110 20c5-9 15-11 22-9-3 7-13 11-22 9Z" fill="currentColor" stroke="none" opacity=".85"/>
+            <path d="M130 20c6-8 16-9 22-6-4 6-14 9-22 6Z" fill="currentColor" stroke="none" opacity=".85"/>
+            <circle cx="100" cy="20" r="3" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
 
-  <!-- ============ МЕСТО ПРОВЕДЕНИЯ ============ -->
-  <section class="venue">
-    <div class="wrap">
-      <div class="venue-head center reveal">
-        <span class="eyebrow">Место проведения</span>
-        <h2 class="display venue-title">Загородный клуб «Голицин»</h2>
-        <!-- оливковая веточка -->
-        <svg class="sprig small" viewBox="0 0 200 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+        <div class="venue-grid">
+          <div class="venue-photo photo arch reveal">
+            <div class="ph-label">
+              <svg class="ph-icon" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+                <path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-6h6v6"/>
+              </svg>
+              Фото площадки
+            </div>
+          </div>
+
+          <div class="map-frame reveal">
+            <iframe
+              src="https://yandex.ru/map-widget/v1/org/zagorodny_klub_golitsyn/229324404955/?ll=39.806874%2C47.215762&z=16"
+              title="Загородный клуб Голицин на Яндекс Картах"
+              loading="lazy"
+              allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <div class="venue-address reveal">
+          <p class="addr">Ростовская область, Аксайский район</p>
+          <p class="addr-sub">Точный адрес и схему проезда смотрите на карте</p>
+          <a class="btn" href="https://yandex.ru/maps/org/zagorodny_klub_golitsyn/229324404955/?ll=39.806874%2C47.215762&z=16.98" target="_blank" rel="noopener">
+            Открыть в Яндекс Картах
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ПРОГРАММА ДНЯ ============ -->
+    <section class="slide" data-name="Программа" aria-label="Программа дня">
+      <div class="wrap">
+        <div class="program-head center reveal">
+          <span class="eyebrow">Расписание</span>
+          <h2 class="display program-title">Программа дня</h2>
+        </div>
+
+        <div class="timeline">
+          <div class="tl-item reveal">
+            <div class="tl-time">15:00</div>
+            <div class="tl-event">Сбор гостей<small>Welcome-зона, лёгкие напитки и музыка</small></div>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-time">16:00</div>
+            <div class="tl-event">Церемония<small>Самый трепетный момент нашего дня</small></div>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-time">17:00</div>
+            <div class="tl-event">Праздничный фуршет<small>Поздравления, фотографии и тёплые слова</small></div>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-time">18:00</div>
+            <div class="tl-event">Банкет<small>Ужин, тосты и первый танец</small></div>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-time">21:00</div>
+            <div class="tl-event">Вечерняя программа<small>Танцы до последнего гостя</small></div>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-time">22:30</div>
+            <div class="tl-event">Финал вечера<small>Завершающий сюрприз под открытым небом</small></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ЦВЕТОВАЯ ГАММА ============ -->
+    <section class="slide slide-bg-soft center" data-name="Дресс-код" aria-label="Дресс-код">
+      <div class="wrap">
+        <span class="eyebrow reveal">Дресс-код</span>
+        <p class="display palette-lead reveal">
+          Нам будет приятно, если вы поддержите цветовую гамму нашего праздника
+        </p>
+
+        <div class="swatches">
+          <div class="swatch reveal">
+            <div class="chip olive"></div>
+            <div class="name">Оливковый</div>
+            <div class="hex">#808000</div>
+          </div>
+          <div class="swatch reveal">
+            <div class="chip rose"></div>
+            <div class="name">Пыльно-розовый</div>
+            <div class="hex">#D58A94</div>
+          </div>
+        </div>
+
+        <p class="palette-note reveal">
+          Это всего лишь пожелание. Приходите так, как вам будет комфортно.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ ФИНАЛЬНЫЙ СЛАЙД ============ -->
+    <section class="slide finale" data-name="Финал" aria-label="Приглашение">
+      <div class="wrap">
+        <svg class="sprig reveal" viewBox="0 0 200 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
           <path d="M10 20 H190"/>
           <path d="M70 20c-6-8-16-9-22-6 4 6 14 9 22 6Z" fill="currentColor" stroke="none" opacity=".85"/>
           <path d="M90 20c-5-9-15-11-22-9 3 7 13 11 22 9Z" fill="currentColor" stroke="none" opacity=".85"/>
@@ -291,141 +452,42 @@
           <path d="M130 20c6-8 16-9 22-6-4 6-14 9-22 6Z" fill="currentColor" stroke="none" opacity=".85"/>
           <circle cx="100" cy="20" r="3" fill="currentColor" stroke="none"/>
         </svg>
-      </div>
 
-      <div class="venue-grid">
-        <div class="venue-photo photo arch reveal">
+        <p class="display finale-text reveal">
+          Мы будем рады видеть вас<br>на нашем празднике!
+        </p>
+
+        <div class="finale-photo photo reveal">
           <div class="ph-label">
             <svg class="ph-icon" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
-              <path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-6h6v6"/>
+              <path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 16.5 12 21 12 21Z"/>
             </svg>
-            Фото площадки
+            Фото жениха и невесты
           </div>
         </div>
 
-        <div class="map-frame reveal">
-          <iframe
-            src="https://yandex.ru/map-widget/v1/org/zagorodny_klub_golitsyn/229324404955/?ll=39.806874%2C47.215762&z=16"
-            title="Загородный клуб Голицин на Яндекс Картах"
-            loading="lazy"
-            allowfullscreen></iframe>
-        </div>
+        <p class="finale-sign reveal">Евгений <span class="amp">&amp;</span> Анна</p>
       </div>
+    </section>
 
-      <div class="venue-address reveal">
-        <p class="addr">Ростовская область, Аксайский район</p>
-        <p class="addr-sub">Точный адрес и схему проезда смотрите на карте</p>
-        <a class="btn" href="https://yandex.ru/maps/org/zagorodny_klub_golitsyn/229324404955/?ll=39.806874%2C47.215762&z=16.98" target="_blank" rel="noopener">
-          Открыть в Яндекс Картах
-        </a>
-      </div>
-    </div>
-  </section>
+  </main>
 
-  <!-- ============ ПРОГРАММА ДНЯ ============ -->
-  <section class="program">
-    <div class="wrap">
-      <div class="program-head center reveal">
-        <span class="eyebrow">Расписание</span>
-        <h2 class="display program-title">Программа дня</h2>
-      </div>
-
-      <div class="timeline">
-        <div class="tl-item reveal">
-          <div class="tl-time">15:00</div>
-          <div class="tl-event">Сбор гостей<small>Welcome-зона, лёгкие напитки и музыка</small></div>
-        </div>
-        <div class="tl-item reveal">
-          <div class="tl-time">16:00</div>
-          <div class="tl-event">Церемония<small>Самый трепетный момент нашего дня</small></div>
-        </div>
-        <div class="tl-item reveal">
-          <div class="tl-time">17:00</div>
-          <div class="tl-event">Праздничный фуршет<small>Поздравления, фотографии и тёплые слова</small></div>
-        </div>
-        <div class="tl-item reveal">
-          <div class="tl-time">18:00</div>
-          <div class="tl-event">Банкет<small>Ужин, тосты и первый танец</small></div>
-        </div>
-        <div class="tl-item reveal">
-          <div class="tl-time">21:00</div>
-          <div class="tl-event">Вечерняя программа<small>Танцы до последнего гостя</small></div>
-        </div>
-        <div class="tl-item reveal">
-          <div class="tl-time">22:30</div>
-          <div class="tl-event">Финал вечера<small>Завершающий сюрприз под открытым небом</small></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ ЦВЕТОВАЯ ГАММА ============ -->
-  <section class="palette center">
-    <div class="wrap">
-      <span class="eyebrow reveal">Дресс-код</span>
-      <p class="display palette-lead reveal">
-        Нам будет приятно, если вы поддержите цветовую гамму нашего праздника
-      </p>
-
-      <div class="swatches">
-        <div class="swatch reveal">
-          <div class="chip olive"></div>
-          <div class="name">Оливковый</div>
-          <div class="hex">#808000</div>
-        </div>
-        <div class="swatch reveal">
-          <div class="chip rose"></div>
-          <div class="name">Пыльно-розовый</div>
-          <div class="hex">#D58A94</div>
-        </div>
-      </div>
-
-      <p class="palette-note reveal">
-        Это всего лишь пожелание. Приходите так, как вам будет комфортно.
-      </p>
-    </div>
-  </section>
-
-  <!-- ============ ФИНАЛЬНЫЙ СЛАЙД ============ -->
-  <section class="finale">
-    <div class="wrap">
-      <svg class="sprig reveal" viewBox="0 0 200 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
-        <path d="M10 20 H190"/>
-        <path d="M70 20c-6-8-16-9-22-6 4 6 14 9 22 6Z" fill="currentColor" stroke="none" opacity=".85"/>
-        <path d="M90 20c-5-9-15-11-22-9 3 7 13 11 22 9Z" fill="currentColor" stroke="none" opacity=".85"/>
-        <path d="M110 20c5-9 15-11 22-9-3 7-13 11-22 9Z" fill="currentColor" stroke="none" opacity=".85"/>
-        <path d="M130 20c6-8 16-9 22-6-4 6-14 9-22 6Z" fill="currentColor" stroke="none" opacity=".85"/>
-        <circle cx="100" cy="20" r="3" fill="currentColor" stroke="none"/>
-      </svg>
-
-      <p class="display finale-text reveal">
-        Мы будем рады видеть вас<br>на нашем празднике!
-      </p>
-
-      <div class="finale-photo photo reveal">
-        <div class="ph-label">
-          <svg class="ph-icon" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
-            <path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 16.5 12 21 12 21Z"/>
-          </svg>
-          Фото жениха и невесты
-        </div>
-      </div>
-
-      <p class="finale-sign reveal">Евгений <span class="amp">&amp;</span> Анна</p>
-    </div>
-  </section>
+  <!-- Навигация -->
+  <nav class="dots" id="dots" aria-label="Навигация по разделам"></nav>
+  <button class="nav-next" id="navNext" type="button" aria-label="Следующий раздел">
+    <span>далее</span>
+    <span class="bar" aria-hidden="true"></span>
+  </button>
 
 <script>
   /* ---------- Обратный отсчёт до 30 августа 2026, 16:00 ---------- */
   (function(){
-    var target = new Date(2026, 7, 30, 16, 0, 0).getTime(); // месяцы с 0 → 7 = август
+    var target = new Date(2026, 7, 30, 16, 0, 0).getTime();
     var elD = document.getElementById('cd-days');
     var elH = document.getElementById('cd-hours');
     var elM = document.getElementById('cd-mins');
     var elS = document.getElementById('cd-secs');
-
     function pad(n){return n<10 ? '0'+n : ''+n;}
-
     function tick(){
       var diff = target - Date.now();
       if(diff <= 0){
@@ -442,22 +504,123 @@
     setInterval(tick, 1000);
   })();
 
-  /* ---------- Плавное появление секций при прокрутке ---------- */
+  /* ---------- Смена слайдов с анимацией ---------- */
   (function(){
-    var items = document.querySelectorAll('.reveal');
-    if(!('IntersectionObserver' in window)){
-      items.forEach(function(el){el.classList.add('in');});
-      return;
-    }
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(e){
-        if(e.isIntersecting){
-          e.target.classList.add('in');
-          io.unobserve(e.target);
-        }
+    var slides   = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    var deck     = document.getElementById('deck');
+    var dotsWrap = document.getElementById('dots');
+    var navNext  = document.getElementById('navNext');
+    var progress = document.getElementById('progress');
+    var current  = 0;
+    var busy     = false;                 // блокировка во время анимации
+    var reduce   = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var ANIM     = reduce ? 360 : 820;
+
+    /* — точки-индикаторы — */
+    var dots = slides.map(function(s, i){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('aria-label', s.dataset.name || ('Раздел ' + (i+1)));
+      b.addEventListener('click', function(){ goTo(i); });
+      dotsWrap.appendChild(b);
+      return b;
+    });
+
+    /* — появление элементов внутри слайда со ступенчатой задержкой — */
+    function playReveal(slide){
+      var items = slide.querySelectorAll('.reveal');
+      Array.prototype.forEach.call(items, function(el, i){
+        el.style.transitionDelay = (reduce ? 0 : 90 + i * 110) + 'ms';
+        el.classList.add('in');
       });
-    }, {threshold:0.16});
-    items.forEach(function(el){io.observe(el);});
+    }
+    function resetReveal(slide){
+      var items = slide.querySelectorAll('.reveal');
+      Array.prototype.forEach.call(items, function(el){
+        el.classList.remove('in');
+        el.style.transitionDelay = '';
+      });
+    }
+
+    function render(){
+      slides.forEach(function(s, i){
+        s.classList.toggle('is-active', i === current);
+        s.classList.toggle('is-above', i < current);
+      });
+      dots.forEach(function(d, i){ d.classList.toggle('active', i === current); });
+      progress.style.width = ((current) / (slides.length - 1) * 100) + '%';
+      navNext.classList.toggle('hidden', current === slides.length - 1);
+    }
+
+    function goTo(index){
+      index = Math.max(0, Math.min(slides.length - 1, index));
+      if(busy || index === current) return;
+      busy = true;
+      var prevSlide = slides[current];
+      current = index;
+      resetReveal(prevSlide);
+      render();
+      slides[current].scrollTop = 0;
+      playReveal(slides[current]);
+      setTimeout(function(){ busy = false; }, ANIM);
+    }
+    function next(){ goTo(current + 1); }
+    function prev(){ goTo(current - 1); }
+
+    navNext.addEventListener('click', next);
+
+    /* — стартовое появление — */
+    render();
+    playReveal(slides[current]);
+
+    /* — колесо мыши / тачпад (с учётом внутренней прокрутки слайда) — */
+    var wheelLock = false;
+    deck.addEventListener('wheel', function(e){
+      if(Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;   // горизонтальный жест игнорируем
+      var s = slides[current];
+      var atTop    = s.scrollTop <= 0;
+      var atBottom = s.scrollTop + s.clientHeight >= s.scrollHeight - 1;
+      var down = e.deltaY > 0;
+      // если внутри слайда есть куда скроллить — отдаём прокрутку ему
+      if((down && !atBottom) || (!down && !atTop)) return;
+      e.preventDefault();
+      if(wheelLock || busy) return;
+      if(Math.abs(e.deltaY) < 6) return;
+      wheelLock = true;
+      down ? next() : prev();
+      setTimeout(function(){ wheelLock = false; }, ANIM + 120);
+    }, {passive:false});
+
+    /* — клавиатура — */
+    window.addEventListener('keydown', function(e){
+      switch(e.key){
+        case 'ArrowDown': case 'PageDown': case ' ':
+          e.preventDefault(); next(); break;
+        case 'ArrowUp': case 'PageUp':
+          e.preventDefault(); prev(); break;
+        case 'Home': e.preventDefault(); goTo(0); break;
+        case 'End':  e.preventDefault(); goTo(slides.length - 1); break;
+      }
+    });
+
+    /* — свайпы на тач-устройствах — */
+    var touchY = null, touchScrollTop = 0;
+    deck.addEventListener('touchstart', function(e){
+      touchY = e.touches[0].clientY;
+      touchScrollTop = slides[current].scrollTop;
+    }, {passive:true});
+    deck.addEventListener('touchend', function(e){
+      if(touchY === null) return;
+      var dy = e.changedTouches[0].clientY - touchY;
+      var s = slides[current];
+      var atTop    = touchScrollTop <= 0;
+      var atBottom = touchScrollTop + s.clientHeight >= s.scrollHeight - 1;
+      if(Math.abs(dy) > 60){
+        if(dy < 0 && atBottom) next();
+        else if(dy > 0 && atTop) prev();
+      }
+      touchY = null;
+    }, {passive:true});
   })();
 </script>
 </body>
