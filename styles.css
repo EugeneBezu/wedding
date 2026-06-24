@@ -433,6 +433,30 @@ body{
   transform:scale(1.35);
 }
 
+/* --- Кнопка «Далее» (только на десктопе, в правом нижнем углу) ---
+   По умолчанию скрыта; показывается в десктопном медиазапросе ниже. */
+.nav-next{
+  display:none;
+  position:fixed;bottom:26px;right:clamp(20px,4vw,48px);
+  z-index:30;background:none;border:0;cursor:pointer;color:var(--muted);
+  flex-direction:column;align-items:center;gap:9px;
+  font-family:var(--font-body);font-size:.78rem;letter-spacing:.3em;
+  text-transform:uppercase;transition:opacity .5s var(--ease),color .3s ease;
+}
+.nav-next:hover{color:var(--olive-deep);}
+
+/* Пульсирующая вертикальная чёрточка-«капля» под надписью. */
+.nav-next .bar{
+  width:1px;height:42px;background:var(--olive);opacity:.5;
+  transform-origin:top;animation:drip 2.4s ease-in-out infinite;
+}
+
+/* Скрытое состояние кнопки (на последнем слайде). */
+.nav-next.hidden{opacity:0;pointer-events:none;}
+
+/* Анимация пульсации чёрточки. */
+@keyframes drip{0%,100%{transform:scaleY(.35);opacity:.25;}50%{transform:scaleY(1);opacity:.7;}}
+
 /* --- Прогресс-полоса вверху экрана --- */
 .progress{
   position:fixed;top:0;left:0;height:2px;width:0;z-index:40;
@@ -444,6 +468,13 @@ body{
 /* ============================================================
    14. АДАПТИВ И ДОСТУПНОСТЬ
    ============================================================ */
+
+/* Десктоп: точки уходят в левый нижний угол, а в правом нижнем —
+   симметрично — появляется кнопка «Далее». */
+@media (min-width:761px){
+  .dots{left:clamp(20px,4vw,48px);transform:none;}
+  .nav-next{display:flex;}
+}
 
 /* Средние экраны: уменьшаем боковые веточки, чтобы не теснили контент. */
 @media (max-width:1024px){

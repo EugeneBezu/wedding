@@ -177,6 +177,10 @@
 
   <!-- Навигация -->
   <nav class="dots" id="dots" aria-label="Навигация по разделам"></nav>
+  <button class="nav-next" id="navNext" type="button" aria-label="Следующий раздел">
+    <span>далее</span>
+    <span class="bar" aria-hidden="true"></span>
+  </button>
 
 <script>
   /* ---------- Обратный отсчёт до 30 августа 2026, 16:00 ---------- */
@@ -208,6 +212,7 @@
     var slides   = Array.prototype.slice.call(document.querySelectorAll('.slide'));
     var deck     = document.getElementById('deck');
     var dotsWrap = document.getElementById('dots');
+    var navNext  = document.getElementById('navNext');
     var progress = document.getElementById('progress');
     var current  = 0;
     var busy     = false;                 // блокировка во время анимации
@@ -247,6 +252,7 @@
       });
       dots.forEach(function(d, i){ d.classList.toggle('active', i === current); });
       progress.style.width = ((current) / (slides.length - 1) * 100) + '%';
+      navNext.classList.toggle('hidden', current === slides.length - 1);
     }
 
     function goTo(index){
@@ -263,6 +269,8 @@
     }
     function next(){ goTo(current + 1); }
     function prev(){ goTo(current - 1); }
+
+    navNext.addEventListener('click', next);
 
     /* — стартовое появление — */
     render();
