@@ -330,8 +330,8 @@ body{
 }
 
 /* Название события и пояснение под ним. */
-.tl-event{font-size:1.55rem;color:var(--ink);}
-.tl-event small{display:block;color:var(--muted);font-size:1.32rem; margin-top:2px;}
+.tl-event{font-family:'Cormorant' ,sans-serif;font-size:1.5rem;line-height:1.5;color:var(--ink);}
+.tl-event small{font-family:'Montserrat';display:block;color:var(--muted);font-size:1.16rem;line-height:1.5;margin-top:6px;}
 
 
 /* ============================================================
