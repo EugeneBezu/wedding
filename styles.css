@@ -412,17 +412,15 @@ body{
    13. НАВИГАЦИЯ
    ============================================================ */
 
-/* --- Точки-индикаторы: горизонтальный ряд в левом нижнем углу ---
-   Вынесены к краю, чтобы не перекрывать контент, и смещены влево —
-   не конфликтуют с центральной кнопкой «Далее». */
+/* --- Точки-индикаторы: горизонтальный ряд снизу по центру --- */
 .dots{
-  position:fixed;left:clamp(16px,3vw,30px);bottom:24px;
-  z-index:30;display:flex;flex-direction:row;gap:14px;
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%);
+  z-index:30;display:flex;flex-direction:row;gap:18px;
 }
 
 /* Одна точка — пустой кружок с оливковой обводкой. */
 .dots button{
-  --d:9px;width:var(--d);height:var(--d);padding:0;border:0;cursor:pointer;
+  --d:13px;width:var(--d);height:var(--d);padding:0;border:0;cursor:pointer;
   border-radius:50%;background:transparent;
   box-shadow:inset 0 0 0 1.5px var(--olive);   /* обводка через внутреннюю тень */
   transition:transform .35s var(--ease),background .35s var(--ease),box-shadow .35s var(--ease);
@@ -434,28 +432,6 @@ body{
   background:var(--rose);box-shadow:inset 0 0 0 1.5px var(--rose);
   transform:scale(1.35);
 }
-
-/* --- Кнопка «далее» по центру снизу --- */
-.nav-next{
-  position:fixed;bottom:26px;left:50%;transform:translateX(-50%);
-  z-index:30;background:none;border:0;cursor:pointer;color:var(--muted);
-  display:flex;flex-direction:column;align-items:center;gap:9px;
-  font-family:var(--font-body);font-size:.78rem;letter-spacing:.3em;
-  text-transform:uppercase;transition:opacity .5s var(--ease),color .3s ease;
-}
-.nav-next:hover{color:var(--olive-deep);}
-
-/* Пульсирующая вертикальная чёрточка-«капля» под надписью. */
-.nav-next .bar{
-  width:1px;height:42px;background:var(--olive);opacity:.5;
-  transform-origin:top;animation:drip 2.4s ease-in-out infinite;
-}
-
-/* Скрытое состояние кнопки (на последнем слайде). */
-.nav-next.hidden{opacity:0;pointer-events:none;}
-
-/* Анимация пульсации чёрточки. */
-@keyframes drip{0%,100%{transform:scaleY(.35);opacity:.25;}50%{transform:scaleY(1);opacity:.7;}}
 
 /* --- Прогресс-полоса вверху экрана --- */
 .progress{
