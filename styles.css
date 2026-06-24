@@ -28,7 +28,9 @@
   --bg-soft:   #F2EEE6;   /* фон приглушённых секций (чередование) */
   --olive:     #808000;   /* оливковый акцент (линии, иконки, рамки) */
   --olive-deep:#5F6010;   /* тёмный оливковый — для читаемого текста */
+  --olive-light:#B3B36B;  /* светлый оливковый — образец палитры */
   --rose:      #D58A94;   /* пыльно-розовый акцент (цифры, точки) */
+  --rose-deep: #B26770;   /* тёмный пыльно-розовый — образец палитры */
   --rose-soft: #ECCFD3;   /* светло-розовый — мягкие подложки/градиенты */
   --ink:       #3B3A30;   /* основной тёмный цвет текста */
   --muted:     #807C6E;   /* приглушённый текст (подписи, пояснения) */
@@ -315,31 +317,24 @@ body{
   max-width:600px;margin:18px auto 0;font-size:1.32rem;color:var(--ink);
 }
 
-/* Ряд образцов цвета; переносится на узких экранах. */
+/* Ряд образцов цвета — все шесть в одну строку, без переноса. */
 .swatches{
-  display:flex;gap:clamp(28px,7vw,90px);justify-content:center;
-  margin:54px 0 40px;flex-wrap:wrap;
+  display:flex;gap:clamp(10px,2vw,24px);justify-content:center;align-items:center;
+  margin:54px 0 40px;flex-wrap:nowrap;
 }
 
-/* Один образец: кружок + название + HEX. */
-.swatch{display:flex;flex-direction:column;align-items:center;gap:16px;}
-
-/* Цветной кружок-образец. */
+/* Цветной кружок-образец (ужимается, чтобы ряд помещался по ширине). */
 .chip{
-  width:clamp(110px,26vw,150px);aspect-ratio:1;border-radius:50%;
+  flex:0 1 auto;width:clamp(64px,13vw,118px);aspect-ratio:1;border-radius:50%;
   box-shadow:0 22px 50px -24px rgba(0,0,0,.35);
   position:relative;
 }
-.chip.olive{background:var(--olive);}  /* оливковый образец */
-.chip.rose{background:var(--rose);}    /* розовый образец */
-
-/* Название цвета. */
-.swatch .name{font-family:'Cormorant',serif;font-size:1.4rem;color:var(--ink);}
-
-/* HEX-код под названием. */
-.swatch .hex{
-  font-size:.84rem;letter-spacing:.22em;color:var(--muted);text-transform:uppercase;
-}
+.chip.olive{background:var(--olive);}            /* оливковый (база) */
+.chip.olive-dark{background:var(--olive-deep);}  /* тёмный оливковый */
+.chip.olive-light{background:var(--olive-light);}/* светлый оливковый */
+.chip.rose{background:var(--rose);}              /* пыльно-розовый (база) */
+.chip.rose-dark{background:var(--rose-deep);}    /* тёмный пыльно-розовый */
+.chip.rose-light{background:var(--rose-soft);}   /* светло-розовый */
 
 /* Заключительное примечание (необязательность дресс-кода). */
 .palette-note{
