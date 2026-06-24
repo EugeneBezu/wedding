@@ -1,0 +1,473 @@
+/* =====================================================================
+   Свадебное приглашение «Евгений & Анна» — таблица стилей
+   Структура файла:
+     1. Переменные темы (:root)
+     2. Базовый сброс и настройки документа
+     3. Типографика
+     4. Система слайдов (полноэкранные секции со сменой)
+     5. Общие утилиты раскладки
+     6. Декоративные элементы (веточка, арочное фото)
+     7. Слайд: Титульный + обратный отсчёт
+     8. Слайд: Место проведения
+     9. Слайд: Программа дня
+    10. Слайд: Цветовая гамма (дресс-код)
+    11. Слайд: Финал
+    12. Анимация появления элементов
+    13. Навигация (точки, кнопка «далее», прогресс-полоса)
+    14. Адаптив и доступность
+   ===================================================================== */
+
+
+/* ============================================================
+   1. ПЕРЕМЕННЫЕ ТЕМЫ
+   Единая палитра и общие значения, чтобы менять оформление
+   в одном месте, а не по всему файлу.
+   ============================================================ */
+:root{
+  --bg:        #FBF8F4;   /* основной мягкий тёплый светлый фон */
+  --bg-soft:   #F2EEE6;   /* фон приглушённых секций (чередование) */
+  --olive:     #808000;   /* оливковый акцент (линии, иконки, рамки) */
+  --olive-deep:#5F6010;   /* тёмный оливковый — для читаемого текста */
+  --rose:      #D58A94;   /* пыльно-розовый акцент (цифры, точки) */
+  --rose-soft: #ECCFD3;   /* светло-розовый — мягкие подложки/градиенты */
+  --ink:       #3B3A30;   /* основной тёмный цвет текста */
+  --muted:     #807C6E;   /* приглушённый текст (подписи, пояснения) */
+  --line:      #DDD7C9;   /* цвет тонких разделительных линий и рамок */
+  --maxw: 1080px;         /* максимальная ширина контентной колонки */
+  --ease: cubic-bezier(.22,.68,.28,1); /* единая кривая плавности анимаций */
+}
+
+
+/* ============================================================
+   2. БАЗОВЫЙ СБРОС И ДОКУМЕНТ
+   ============================================================ */
+
+/* Сбрасываем отступы и переводим всё на border-box,
+   чтобы padding не «раздувал» заданную ширину/высоту. */
+*{box-sizing:border-box;margin:0;padding:0;}
+
+/* Тянем корневые элементы на всю высоту окна —
+   слайды позиционируются относительно этой высоты. */
+html,body{height:100%;}
+
+body{
+  background:var(--bg);                  /* базовый фон страницы */
+  color:var(--ink);                      /* цвет текста по умолчанию */
+  font-family:'Montserrat',sans-serif;   /* основной (текстовый) шрифт */
+  font-weight:300;                       /* лёгкое тонкое начертание */
+  line-height:1.7;                       /* просторный межстрочный интервал */
+  -webkit-font-smoothing:antialiased;    /* сглаживание шрифта в WebKit */
+  overflow:hidden;                       /* прокрутку страницы заменяет смена слайдов */
+}
+
+
+/* ============================================================
+   3. ТИПОГРАФИКА
+   ============================================================ */
+
+/* Акцидентный шрифт с засечками для заголовков и крупных надписей. */
+.display{font-family:'Cormorant',serif;font-weight:500;line-height:1.05;}
+
+/* «Бровка» — мелкая прописная надпись-метка над заголовками секций. */
+.eyebrow{
+  font-family:'Montserrat',sans-serif;
+  font-weight:400;
+  font-size:.82rem;
+  letter-spacing:.42em;       /* широкий трекинг — фирменный «разрядка» */
+  text-transform:uppercase;
+  color:var(--olive);
+}
+
+/* Декоративный амперсанд / союз между именами — розовый курсив. */
+.amp{color:var(--rose);font-style:italic;font-weight:400;}
+
+
+/* ============================================================
+   4. СИСТЕМА СЛАЙДОВ
+   Каждая секция — полноэкранный слайд. Виден только активный;
+   остальные либо ждут снизу, либо «уехали» вверх.
+   ============================================================ */
+
+/* Контейнер-сцена: фиксируется на весь экран, скрывает всё, что вне кадра. */
+.deck{position:fixed;inset:0;overflow:hidden;}
+
+.slide{
+  position:absolute;inset:0;             /* каждый слайд занимает весь экран */
+  display:flex;flex-direction:column;    /* контент в колонку… */
+  justify-content:safe center;           /* …по центру, но при переполнении скролл начинается сверху */
+  align-items:center;
+  overflow-y:auto;overflow-x:hidden;     /* длинный контент можно прокрутить внутри слайда */
+  -webkit-overflow-scrolling:touch;      /* инерционная прокрутка в iOS */
+  padding:clamp(56px,9vw,120px) 24px;    /* адаптивные внутренние поля */
+
+  /* Исходное (скрытое) состояние: слайд чуть ниже и слегка уменьшен. */
+  opacity:0;visibility:hidden;
+  transform:translateY(7%) scale(.985);
+
+  /* Плавный переход всех трёх свойств единой кривой. */
+  transition:opacity .8s var(--ease),
+             transform .8s var(--ease),
+             visibility .8s var(--ease);
+  will-change:opacity,transform;         /* подсказка браузеру для плавности */
+}
+
+/* Активный слайд: проявлен, в исходной позиции, поверх остальных. */
+.slide.is-active{
+  opacity:1;visibility:visible;
+  transform:none;
+  z-index:2;
+}
+
+/* Уже пройденные слайды уезжают вверх — создаёт направленность перехода. */
+.slide.is-above{
+  transform:translateY(-7%) scale(.985);
+}
+
+/* Модификатор приглушённого фона для чередования секций. */
+.slide-bg-soft{background:var(--bg-soft);}
+
+
+/* ============================================================
+   5. УТИЛИТЫ РАСКЛАДКИ
+   ============================================================ */
+
+/* Центрированная контентная колонка ограниченной ширины. */
+.wrap{max-width:var(--maxw);margin:0 auto;width:100%;}
+
+/* Утилита выравнивания текста по центру. */
+.center{text-align:center;}
+
+
+/* ============================================================
+   6. ДЕКОРАТИВНЫЕ ЭЛЕМЕНТЫ
+   ============================================================ */
+
+/* Оливковая веточка-разделитель (SVG), фирменный элемент оформления. */
+.sprig{display:block;margin:0 auto;width:160px;height:auto;color:var(--olive);opacity:.9;}
+.sprig.small{width:96px;}   /* уменьшенный вариант под заголовками */
+
+/* Рамка-«арка» для фото: скруглён верх, низ почти прямой. */
+.photo{
+  position:relative;
+  border-radius:50% 50% 8px 8px / 38% 38% 8px 8px; /* форма арки через раздельные радиусы */
+  overflow:hidden;                                  /* обрезаем содержимое по форме */
+  background:                                       /* мягкий градиент-заполнитель вместо фото */
+    linear-gradient(150deg, var(--rose-soft), var(--bg-soft) 55%, #E4E3D2);
+  border:1px solid var(--line);
+  box-shadow:0 24px 60px -28px rgba(95,96,16,.4);   /* мягкая оливковая тень */
+  display:flex;align-items:center;justify-content:center; /* центрируем подпись-заглушку */
+  color:var(--muted);
+}
+
+/* Текстовая подпись внутри заглушки фото. */
+.photo .ph-label{
+  text-align:center;font-size:.74rem;letter-spacing:.28em;
+  text-transform:uppercase;
+}
+
+/* Иконка над подписью внутри заглушки фото. */
+.photo .ph-icon{display:block;margin:0 auto 12px;color:var(--olive);opacity:.65;}
+
+
+/* ============================================================
+   7. СЛАЙД: ТИТУЛЬНЫЙ
+   ============================================================ */
+
+/* Контейнер титульного слайда: центрирование и просветы между блоками. */
+.hero{gap:30px;text-align:center;position:relative;}
+
+/* Монограмма «Е · А» над именами. */
+.hero-monogram{
+  font-family:'Cormorant',serif;font-size:1.5rem;letter-spacing:.3em;
+  color:var(--olive-deep);
+}
+
+/* Крупные имена пары — главный акцент страницы (резиновый размер). */
+.hero-names{
+  font-size:clamp(3.4rem,13vw,8.2rem);
+  color:var(--ink);
+}
+.hero-names .row{display:block;}   /* каждое имя с новой строки */
+
+/* Заглушка фото пары на титуле, пропорции портрета 3:4. */
+.hero-photo{
+  width:min(300px,72vw);aspect-ratio:3/4;margin:8px auto;
+}
+
+/* Дата свадьбы крупными цифрами. */
+.hero-date{
+  font-family:'Cormorant',serif;font-size:clamp(1.5rem,4.5vw,2.4rem);
+  color:var(--olive-deep);letter-spacing:.04em;
+}
+.hero-date .dot{color:var(--rose);padding:0 .5em;}  /* розовые точки-разделители */
+
+/* --- Обратный отсчёт --- */
+
+/* Ряд из ячеек отсчёта; переносится на узких экранах. */
+.countdown{
+  display:flex;gap:clamp(14px,4vw,40px);justify-content:center;
+  margin-top:6px;flex-wrap:wrap;
+}
+.cd-cell{min-width:62px;}  /* фиксированная минимальная ширина — цифры не «прыгают» */
+
+/* Крупная цифра отсчёта. */
+.cd-num{
+  font-family:'Cormorant',serif;font-weight:600;
+  font-size:clamp(2rem,6vw,3rem);color:var(--rose);line-height:1;
+}
+
+/* Подпись под цифрой (дней/часов/…). */
+.cd-lbl{
+  font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--muted);margin-top:8px;
+}
+
+
+/* ============================================================
+   8. СЛАЙД: МЕСТО ПРОВЕДЕНИЯ
+   ============================================================ */
+
+/* Шапка секции (бровка + заголовок + веточка). */
+.venue-head{margin-bottom:48px;}
+
+/* Название площадки. */
+.venue-title{font-size:clamp(2.4rem,6vw,3.6rem);margin:14px 0 6px;}
+
+/* Двухколоночная сетка: фото площадки + карта. */
+.venue-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,48px);
+  align-items:stretch;   /* колонки одинаковой высоты */
+}
+
+/* Заглушка фото площадки. */
+.venue-photo{aspect-ratio:4/5;height:100%;border-radius:8px;}
+.venue-photo.arch{border-radius:50% 50% 8px 8px / 26% 26% 8px 8px;} /* вариант-арка */
+
+/* Рамка вокруг встроенной карты. */
+.map-frame{
+  border:1px solid var(--line);border-radius:8px;overflow:hidden;
+  box-shadow:0 24px 60px -34px rgba(95,96,16,.45);
+  background:var(--bg);min-height:340px;height:100%;
+}
+.map-frame iframe{display:block;width:100%;height:100%;min-height:340px;border:0;}
+
+/* Блок адреса под сеткой. */
+.venue-address{margin-top:40px;text-align:center;}
+.venue-address .addr{
+  font-family:'Cormorant',serif;font-size:1.5rem;color:var(--ink);
+}
+.venue-address .addr-sub{color:var(--muted);font-size:1.06rem;margin-top:6px;}
+
+/* Контурная кнопка-ссылка (например, «Открыть в Яндекс Картах»). */
+.btn{
+  display:inline-block;margin-top:24px;
+  font-size:.84rem;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--olive-deep);text-decoration:none;
+  border:1px solid var(--olive);border-radius:40px;
+  padding:14px 30px;transition:.3s ease;
+}
+/* При наведении/фокусе кнопка заливается оливковым. */
+.btn:hover,.btn:focus-visible{background:var(--olive);color:#fff;}
+
+
+/* ============================================================
+   9. СЛАЙД: ПРОГРАММА ДНЯ
+   ============================================================ */
+
+/* Шапка секции. */
+.program-head{margin-bottom:54px;}
+.program-title{font-size:clamp(2.4rem,6vw,3.6rem);margin-top:14px;}
+
+/* Контейнер таймлайна; relative — для вертикальной линии и точек. */
+.timeline{max-width:620px;margin:0 auto;position:relative;width:100%;}
+
+/* Вертикальная линия таймлайна с градиентом по краям. */
+.timeline::before{
+  content:"";position:absolute;left:118px;top:8px;bottom:8px;width:1px;
+  background:linear-gradient(var(--rose-soft),var(--line),var(--rose-soft));
+}
+
+/* Строка таймлайна: колонка времени + колонка события. */
+.tl-item{
+  display:grid;grid-template-columns:100px 1fr;gap:34px;align-items:baseline;
+  padding:18px 0;position:relative;
+}
+
+/* Время события — выровнено вправо, к линии. */
+.tl-time{
+  font-family:'Cormorant',serif;font-weight:600;font-size:1.6rem;
+  color:var(--olive-deep);text-align:right;
+}
+
+/* Розовая точка-маркер на линии напротив каждого события. */
+.tl-item::after{
+  content:"";position:absolute;left:114px;top:30px;
+  width:9px;height:9px;border-radius:50%;
+  background:var(--rose);border:2px solid var(--bg-soft); /* обводка под фон секции */
+}
+
+/* Название события и пояснение под ним. */
+.tl-event{font-size:1.2rem;color:var(--ink);}
+.tl-event small{display:block;color:var(--muted);font-size:1rem;margin-top:2px;}
+
+
+/* ============================================================
+   10. СЛАЙД: ЦВЕТОВАЯ ГАММА (ДРЕСС-КОД)
+   ============================================================ */
+
+/* Вводный абзац-просьба поддержать палитру. */
+.palette-lead{
+  max-width:600px;margin:18px auto 0;font-size:1.32rem;color:var(--ink);
+}
+
+/* Ряд образцов цвета; переносится на узких экранах. */
+.swatches{
+  display:flex;gap:clamp(28px,7vw,90px);justify-content:center;
+  margin:54px 0 40px;flex-wrap:wrap;
+}
+
+/* Один образец: кружок + название + HEX. */
+.swatch{display:flex;flex-direction:column;align-items:center;gap:16px;}
+
+/* Цветной кружок-образец. */
+.chip{
+  width:clamp(110px,26vw,150px);aspect-ratio:1;border-radius:50%;
+  box-shadow:0 22px 50px -24px rgba(0,0,0,.35);
+  position:relative;
+}
+.chip.olive{background:var(--olive);}  /* оливковый образец */
+.chip.rose{background:var(--rose);}    /* розовый образец */
+
+/* Название цвета. */
+.swatch .name{font-family:'Cormorant',serif;font-size:1.4rem;color:var(--ink);}
+
+/* HEX-код под названием. */
+.swatch .hex{
+  font-size:.84rem;letter-spacing:.22em;color:var(--muted);text-transform:uppercase;
+}
+
+/* Заключительное примечание (необязательность дресс-кода). */
+.palette-note{
+  max-width:520px;margin:0 auto;font-size:1.04rem;color:var(--muted);font-style:italic;
+}
+
+
+/* ============================================================
+   11. СЛАЙД: ФИНАЛ
+   ============================================================ */
+
+/* Финальный слайд с мягким розовым свечением сверху. */
+.finale{
+  text-align:center;
+  background:
+    radial-gradient(120% 90% at 50% 0%, var(--rose-soft) 0%, transparent 55%),
+    var(--bg);
+}
+
+/* Заглушка фото жениха и невесты. */
+.finale-photo{width:min(360px,80vw);aspect-ratio:4/5;margin:40px auto 0;}
+
+/* Крупная приглашающая фраза. */
+.finale-text{
+  font-size:clamp(2rem,5.5vw,3.2rem);max-width:680px;margin:0 auto;color:var(--ink);
+}
+
+/* Подпись именами в конце. */
+.finale-sign{
+  margin-top:36px;font-family:'Cormorant',serif;font-size:1.8rem;letter-spacing:.12em;
+  color:var(--olive-deep);
+}
+
+
+/* ============================================================
+   12. АНИМАЦИЯ ПОЯВЛЕНИЯ ЭЛЕМЕНТОВ
+   Элементы с классом .reveal внутри активного слайда плавно
+   проявляются (ступенчатую задержку задаёт JS).
+   ============================================================ */
+
+/* Исходное скрытое состояние: прозрачно и чуть ниже. */
+.reveal{
+  opacity:0;transform:translateY(26px);
+  transition:opacity .8s var(--ease),transform .8s var(--ease);
+}
+
+/* Проявленное состояние — только внутри активного слайда. */
+.slide.is-active .reveal.in{opacity:1;transform:none;}
+
+
+/* ============================================================
+   13. НАВИГАЦИЯ
+   ============================================================ */
+
+/* --- Точки-индикаторы справа по центру экрана --- */
+.dots{
+  position:fixed;top:50%;right:clamp(14px,2.6vw,30px);transform:translateY(-50%);
+  z-index:30;display:flex;flex-direction:column;gap:16px;
+}
+
+/* Одна точка — пустой кружок с оливковой обводкой. */
+.dots button{
+  --d:9px;width:var(--d);height:var(--d);padding:0;border:0;cursor:pointer;
+  border-radius:50%;background:transparent;
+  box-shadow:inset 0 0 0 1.5px var(--olive);   /* обводка через внутреннюю тень */
+  transition:transform .35s var(--ease),background .35s var(--ease),box-shadow .35s var(--ease);
+}
+.dots button:hover{transform:scale(1.25);}      /* лёгкое увеличение при наведении */
+
+/* Активная точка — залита розовым и крупнее. */
+.dots button.active{
+  background:var(--rose);box-shadow:inset 0 0 0 1.5px var(--rose);
+  transform:scale(1.35);
+}
+
+/* --- Кнопка «далее» по центру снизу --- */
+.nav-next{
+  position:fixed;bottom:26px;left:50%;transform:translateX(-50%);
+  z-index:30;background:none;border:0;cursor:pointer;color:var(--muted);
+  display:flex;flex-direction:column;align-items:center;gap:9px;
+  font-family:'Montserrat',sans-serif;font-size:.68rem;letter-spacing:.3em;
+  text-transform:uppercase;transition:opacity .5s var(--ease),color .3s ease;
+}
+.nav-next:hover{color:var(--olive-deep);}
+
+/* Пульсирующая вертикальная чёрточка-«капля» под надписью. */
+.nav-next .bar{
+  width:1px;height:42px;background:var(--olive);opacity:.5;
+  transform-origin:top;animation:drip 2.4s ease-in-out infinite;
+}
+
+/* Скрытое состояние кнопки (на последнем слайде). */
+.nav-next.hidden{opacity:0;pointer-events:none;}
+
+/* Анимация пульсации чёрточки. */
+@keyframes drip{0%,100%{transform:scaleY(.35);opacity:.25;}50%{transform:scaleY(1);opacity:.7;}}
+
+/* --- Прогресс-полоса вверху экрана --- */
+.progress{
+  position:fixed;top:0;left:0;height:2px;width:0;z-index:40;
+  background:linear-gradient(90deg,var(--olive),var(--rose)); /* оливково-розовый градиент */
+  transition:width .8s var(--ease);                           /* плавный рост ширины */
+}
+
+
+/* ============================================================
+   14. АДАПТИВ И ДОСТУПНОСТЬ
+   ============================================================ */
+
+/* Узкие экраны (телефоны): карта под фото, компактнее таймлайн. */
+@media (max-width:760px){
+  .venue-grid{grid-template-columns:1fr;}  /* колонки в одну */
+  .timeline::before{left:84px;}            /* линия и точки ближе к краю */
+  .tl-item{grid-template-columns:70px 1fr;gap:24px;}
+  .tl-item::after{left:80px;}
+  .tl-time{font-size:1.3rem;}
+  .dots{gap:13px;}
+}
+
+/* Уважаем системную настройку «уменьшить движение»:
+   отключаем перемещения, оставляя только короткое затухание. */
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;}
+  .slide{transition:opacity .35s linear,visibility .35s linear;transform:none!important;}
+  .reveal{transition:opacity .35s linear;transform:none!important;}
+}
