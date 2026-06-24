@@ -412,6 +412,23 @@ body{
    13. НАВИГАЦИЯ
    ============================================================ */
 
+/* --- Матовая полоса снизу ---
+   Фиксированная зона у нижнего края. Размывает контент слайда,
+   уезжающий под панель навигации, и сводит его к фону, чтобы текст
+   не «налезал» на точки и кнопку. Лежит над слайдами (z-index:2),
+   но под навигацией (z-index:30) — поэтому сами точки/кнопка чёткие. */
+.bottom-fade{
+  position:fixed;left:0;right:0;bottom:0;
+  height:clamp(84px,13vh,132px);
+  z-index:20;pointer-events:none;
+  -webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);
+  /* лёгкая подложка под цвет фона — текст «растворяется», а не просто мылится */
+  background:linear-gradient(to top, var(--bg) 0%, rgba(251,248,244,.55) 42%, transparent 100%);
+  /* маска: эффект максимален у самого низа и плавно исчезает кверху */
+  -webkit-mask-image:linear-gradient(to top, #000 0, #000 32%, transparent 100%);
+          mask-image:linear-gradient(to top, #000 0, #000 32%, transparent 100%);
+}
+
 /* --- Точки-индикаторы: горизонтальный ряд снизу по центру --- */
 .dots{
   position:fixed;left:50%;bottom:26px;transform:translateX(-50%);
