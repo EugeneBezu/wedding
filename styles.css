@@ -55,7 +55,7 @@ html,body{height:100%;}
 body{
   background:var(--bg);                  /* базовый фон страницы */
   color:var(--ink);                      /* цвет текста по умолчанию */
-  font-family:'Montserrat',sans-serif;   /* основной (текстовый) шрифт */
+  font-family:var(--font-body);   /* основной (текстовый) шрифт */
   font-weight:400;                       /* лёгкое тонкое начертание */
   line-height:1.7;                       /* просторный межстрочный интервал */
   -webkit-font-smoothing:antialiased;    /* сглаживание шрифта в WebKit */
@@ -68,11 +68,11 @@ body{
    ============================================================ */
 
 /* Акцидентный шрифт с засечками для заголовков и крупных надписей. */
-.display{font-family:'Cormorant',serif;font-weight:500;line-height:1.05;}
+.display{font-family:var(--font-display);font-weight:500;line-height:1.05;}
 
 /* «Бровка» — мелкая прописная надпись-метка над заголовками секций. */
 .eyebrow{
-  font-family:'Montserrat',sans-serif;
+  font-family:var(--font-body);
   font-weight:400;
   font-size: 1.35rem;
   letter-spacing:.42em;       /* широкий трекинг — фирменный «разрядка» */
@@ -188,7 +188,7 @@ body{
 
 /* Монограмма «Е · А» над именами. */
 .hero-monogram{
-  font-family:'Cormorant',serif;font-size:1.5rem;letter-spacing:.3em;
+  font-family:var(--font-display);font-size:1.5rem;letter-spacing:.3em;
   color:var(--olive-deep);
 }
 
@@ -201,7 +201,7 @@ body{
 
 /* Дата свадьбы крупными цифрами. */
 .hero-date{
-  font-family:'Cormorant',serif;font-size:clamp(1.5rem,4.5vw,2.4rem);
+  font-family:var(--font-display);font-size:clamp(1.5rem,4.5vw,2.4rem);
   color:var(--olive-deep);letter-spacing:.04em;
 }
 .hero-date .dot{color:var(--rose);padding:0 .5em;}  /* розовые точки-разделители */
@@ -217,7 +217,7 @@ body{
 
 /* Крупная цифра отсчёта. */
 .cd-num{
-  font-family:'Cormorant',serif;font-weight:600;
+  font-family:var(--font-display);font-weight:600;
   font-size:clamp(2rem,6vw,3rem);color:var(--rose);line-height:1;
 }
 
@@ -252,7 +252,7 @@ body{
 
 /* Адрес (выровнен по левому краю колонки). */
 .venue-address .addr{
-  font-family:'Cormorant',serif;font-size:1.5rem;line-height:1.2;color:var(--ink);
+  font-family:var(--font-display);font-size:1.5rem;line-height:1.2;color:var(--ink);
 }
 .venue-address .addr-sub{color:var(--muted);font-size:1.16rem;margin-top:8px;line-height:1.5;}
 
@@ -318,7 +318,7 @@ body{
 
 /* Время события — выровнено вправо, к линии. */
 .tl-time{
-  font-family:'Cormorant',serif;font-weight:600;font-size:1.6rem;
+  font-family:var(--font-display);font-weight:600;font-size:1.6rem;
   color:var(--olive-deep);text-align:right;
 }
 
@@ -330,8 +330,8 @@ body{
 }
 
 /* Название события и пояснение под ним. */
-.tl-event{font-family:'Cormorant' ,sans-serif;font-size:1.5rem;line-height:1.5;color:var(--ink);}
-.tl-event small{font-family:'Montserrat';display:block;color:var(--muted);font-size:1.16rem;line-height:1.5;margin-top:6px;}
+.tl-event{font-family:var(--font-display);font-size:1.5rem;line-height:1.5;color:var(--ink);}
+.tl-event small{font-family:var(--font-body);display:block;color:var(--muted);font-size:1.16rem;line-height:1.5;margin-top:6px;}
 
 
 /* ============================================================
@@ -387,7 +387,7 @@ body{
 
 /* Подпись именами в конце. */
 .finale-sign{
-  margin-top:36px;font-family:'Cormorant',serif;font-size:1.8rem;letter-spacing:.12em;
+  margin-top:36px;font-family:var(--font-display);font-size:1.8rem;letter-spacing:.12em;
   color:var(--olive-deep);
 }
 
@@ -440,7 +440,7 @@ body{
   position:fixed;bottom:26px;left:50%;transform:translateX(-50%);
   z-index:30;background:none;border:0;cursor:pointer;color:var(--muted);
   display:flex;flex-direction:column;align-items:center;gap:9px;
-  font-family:'Montserrat',sans-serif;font-size:.78rem;letter-spacing:.3em;
+  font-family:var(--font-body);font-size:.78rem;letter-spacing:.3em;
   text-transform:uppercase;transition:opacity .5s var(--ease),color .3s ease;
 }
 .nav-next:hover{color:var(--olive-deep);}
